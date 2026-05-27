@@ -1,0 +1,10 @@
+target/
+.mvn/apache-maven-3.9.6/
+.mvn/maven.zip
+*.class
+.project
+.classpath
+.settings/
+.idea/
+*.iml
+*.log

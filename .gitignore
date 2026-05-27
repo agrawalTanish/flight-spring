@@ -1,0 +1,7 @@
+flight-service/target/
+flight-service/.mvn/apache-maven-3.9.6/
+flight-app/node_modules/
+flight-app/dist/
+.idea/
+.vscode/
+*.log
