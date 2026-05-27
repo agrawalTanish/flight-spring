@@ -1,0 +1,19 @@
+package com.flightservice.config;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class OpenApiConfig {
+
+    @Bean
+    public OpenAPI flightServiceOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Flight Management Service API")
+                        .description("REST API specifications for storing, updating, deleting and advanced searching of flights")
+                        .version("1.0.0"));
+    }
+}
