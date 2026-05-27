@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { flightService } from '../services/flightService'
-import { Search, Compass, DollarSign, RotateCcw, AlertCircle, Trash2 } from 'lucide-react'
+import { Search, Compass, DollarSign, RotateCcw, AlertCircle, Trash2, Ticket } from 'lucide-react'
+import BoardingPassModal from './BoardingPassModal'
 
 export default function FlightSearch() {
   const [activeTab, setActiveTab] = useState('code')
@@ -8,6 +9,8 @@ export default function FlightSearch() {
   const [searched, setSearched] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedFlight, setSelectedFlight] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [codeQuery, setCodeQuery] = useState('')
   const [carrierQuery, setCarrierQuery] = useState('')
@@ -45,7 +48,7 @@ export default function FlightSearch() {
           if (err.response && err.response.status === 404) {
             data = []
           } else {
-            throw err;
+            throw err
           }
         }
       } else if (activeTab === 'carrier') {
@@ -97,15 +100,20 @@ export default function FlightSearch() {
     }
   }
 
+  const handleViewTicket = (flight) => {
+    setSelectedFlight(flight)
+    setIsModalOpen(true)
+  }
+
   return (
-    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
       <div>
-        <h1 class="text-3xl font-extrabold tracking-tight text-white">Search Hub</h1>
-        <p class="text-slate-400 mt-1 text-sm">Query unique flight paths, price windows, carrier portfolios, and codes</p>
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Search Hub</h1>
+        <p className="text-slate-400 mt-1 text-sm">Query unique flight paths, price windows, carrier portfolios, and codes</p>
       </div>
 
-      <div class="glass-card rounded-3xl p-6 md:p-8 shadow-xl space-y-6">
-        <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-5">
+      <div className="glass-card rounded-3xl p-6 md:p-8 shadow-xl space-y-6">
+        <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-5">
           {[
             { id: 'code', label: 'Flight Code', icon: Search },
             { id: 'carrier', label: 'Airline / Carrier', icon: Search },
@@ -120,13 +128,13 @@ export default function FlightSearch() {
                   setActiveTab(tab.id)
                   setError('')
                 }}
-                class={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   activeTab === tab.id
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                    : 'text-slate-400 hover:text-slate-800 hover:bg-white hover:bg-slate-50'
                 }`}
               >
-                <Icon class="w-4 h-4" />
+                <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
               </button>
             )
@@ -134,17 +142,17 @@ export default function FlightSearch() {
         </div>
 
         {error && (
-          <div class="flex items-start gap-3 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm">
-            <AlertCircle class="w-5 h-5 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm">
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSearch} class="flex flex-col md:flex-row md:items-end gap-5">
-          <div class="flex-1">
+        <form onSubmit={handleSearch} className="flex flex-col md:flex-row md:items-end gap-5">
+          <div className="flex-1">
             {activeTab === 'code' && (
               <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
                   Enter Flight Code
                 </label>
                 <input
@@ -152,7 +160,7 @@ export default function FlightSearch() {
                   value={codeQuery}
                   onChange={(e) => setCodeQuery(e.target.value)}
                   placeholder="e.g. AA-101"
-                  class="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-500"
                   required
                 />
               </div>
@@ -160,7 +168,7 @@ export default function FlightSearch() {
 
             {activeTab === 'carrier' && (
               <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
                   Enter Airline Carrier
                 </label>
                 <input
@@ -168,16 +176,16 @@ export default function FlightSearch() {
                   value={carrierQuery}
                   onChange={(e) => setCarrierQuery(e.target.value)}
                   placeholder="e.g. Air India"
-                  class="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-500"
                   required
                 />
               </div>
             )}
 
             {activeTab === 'route' && (
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
                     Source Route
                   </label>
                   <input
@@ -185,12 +193,12 @@ export default function FlightSearch() {
                     value={routeQuery.source}
                     onChange={(e) => setRouteQuery((prev) => ({ ...prev, source: e.target.value }))}
                     placeholder="e.g. Nagpur"
-                    class="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-500"
                     required
                   />
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
                     Destination Route
                   </label>
                   <input
@@ -198,7 +206,7 @@ export default function FlightSearch() {
                     value={routeQuery.destination}
                     onChange={(e) => setRouteQuery((prev) => ({ ...prev, destination: e.target.value }))}
                     placeholder="e.g. Pune"
-                    class="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-500"
                     required
                   />
                 </div>
@@ -206,9 +214,9 @@ export default function FlightSearch() {
             )}
 
             {activeTab === 'price' && (
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
                     Minimum Price (INR)
                   </label>
                   <input
@@ -216,12 +224,12 @@ export default function FlightSearch() {
                     value={priceQuery.min}
                     onChange={(e) => setPriceQuery((prev) => ({ ...prev, min: e.target.value }))}
                     placeholder="Min e.g. 1000"
-                    class="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-500"
                     required
                   />
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
                     Maximum Price (INR)
                   </label>
                   <input
@@ -229,7 +237,7 @@ export default function FlightSearch() {
                     value={priceQuery.max}
                     onChange={(e) => setPriceQuery((prev) => ({ ...prev, max: e.target.value }))}
                     placeholder="Max e.g. 5000"
-                    class="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-500"
                     required
                   />
                 </div>
@@ -237,21 +245,21 @@ export default function FlightSearch() {
             )}
           </div>
 
-          <div class="flex gap-3">
+          <div className="flex gap-3">
             <button
               type="submit"
               disabled={loading}
-              class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-600/20 disabled:opacity-50"
+              className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-slate-900 font-semibold transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/20 disabled:opacity-50"
             >
-              <Search class="w-4 h-4" />
+              <Search className="w-4 h-4" />
               <span>{loading ? 'Searching...' : 'Search'}</span>
             </button>
             <button
               type="button"
               onClick={handleReset}
-              class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold transition-all flex items-center justify-center gap-1.5 border border-slate-700"
+              className="px-5 py-3 rounded-xl bg-white hover:bg-slate-700 text-slate-600 font-semibold transition-all flex items-center justify-center gap-1.5 border border-slate-200"
             >
-              <RotateCcw class="w-4 h-4" />
+              <RotateCcw className="w-4 h-4" />
               <span>Reset</span>
             </button>
           </div>
@@ -259,58 +267,66 @@ export default function FlightSearch() {
       </div>
 
       {searched && (
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-bold text-white">Search Results ({results.length})</h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-slate-900">Search Results ({results.length})</h3>
           </div>
 
           {results.length === 0 ? (
-            <div class="glass-card rounded-3xl py-12 px-4 text-center">
-              <Compass class="w-10 h-10 text-slate-600 mx-auto mb-3" />
-              <p class="text-slate-300 font-medium">No Matching Flights Found</p>
-              <p class="text-slate-500 text-xs mt-1">Adjust search parameters or select a different tab option.</p>
+            <div className="glass-card rounded-3xl py-12 px-4 text-center">
+              <Compass className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-600 font-medium">No Matching Flights Found</p>
+              <p className="text-slate-400 text-xs mt-1">Adjust search parameters or select a different tab option.</p>
             </div>
           ) : (
-            <div class="glass-card rounded-3xl overflow-hidden border border-slate-800">
-              <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+            <div className="glass-card rounded-3xl overflow-hidden border border-slate-200">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr class="bg-slate-900/60 border-b border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400">
-                      <th class="px-6 py-4">Flight Code</th>
-                      <th class="px-6 py-4">Carrier / Airline</th>
-                      <th class="px-6 py-4">Route</th>
-                      <th class="px-6 py-4">Ticket Price</th>
-                      <th class="px-6 py-4 text-right">Actions</th>
+                    <tr className="bg-slate-100 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <th className="px-6 py-4">Flight Code</th>
+                      <th className="px-6 py-4">Carrier / Airline</th>
+                      <th className="px-6 py-4">Route</th>
+                      <th className="px-6 py-4">Ticket Price</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-800/50">
+                  <tbody className="divide-y divide-slate-800/50">
                     {results.map((flight) => (
-                      <tr key={flight.id} class="hover:bg-slate-800/20 transition-all">
-                        <td class="px-6 py-4.5">
-                          <span class="px-3 py-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 text-sm font-bold border border-indigo-500/10">
+                      <tr key={flight.id} className="hover:bg-slate-50/80 transition-all">
+                        <td className="px-6 py-4">
+                          <span className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-sm font-bold border border-blue-500/10">
                             {flight.code}
                           </span>
                         </td>
-                        <td class="px-6 py-4.5 font-medium text-slate-200">
-                          {flight.carrier}
-                        </td>
-                        <td class="px-6 py-4.5">
-                          <div class="flex items-center gap-2 text-sm text-slate-300">
-                            <span class="font-semibold text-slate-200">{flight.source}</span>
-                            <span class="text-slate-500">➔</span>
-                            <span class="font-semibold text-slate-200">{flight.destination}</span>
+                        <td className="px-6 py-4 font-medium text-slate-800">{flight.carrier}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2 text-sm text-slate-600">
+                            <span className="font-semibold text-slate-800">{flight.source}</span>
+                            <span className="text-blue-500/70">➔</span>
+                            <span className="font-semibold text-slate-800">{flight.destination}</span>
                           </div>
                         </td>
-                        <td class="px-6 py-4.5 text-slate-300 font-semibold text-sm">
+                        <td className="px-6 py-4 text-slate-600 font-semibold text-sm">
                           ₹{flight.cost.toLocaleString('en-IN')}
                         </td>
-                        <td class="px-6 py-4.5 text-right">
-                          <button
-                            onClick={() => handleDelete(flight.code)}
-                            class="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all scale-100 hover:scale-105 active:scale-95"
-                          >
-                            <Trash2 class="w-4.5 h-4.5" />
-                          </button>
+                        <td className="px-6 py-4 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => handleViewTicket(flight)}
+                              title="View Boarding Pass"
+                              className="p-2 rounded-xl text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 border border-transparent hover:border-blue-500/20 transition-all scale-100 hover:scale-105 active:scale-95"
+                            >
+                              <Ticket className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(flight.code)}
+                              title="Delete Flight"
+                              className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all scale-100 hover:scale-105 active:scale-95"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -321,6 +337,13 @@ export default function FlightSearch() {
           )}
         </div>
       )}
+
+      <BoardingPassModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        flight={selectedFlight}
+        passengerName="DDFlights Passenger"
+      />
     </div>
   )
 }
